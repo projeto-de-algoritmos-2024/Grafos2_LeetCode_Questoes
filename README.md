@@ -16,9 +16,13 @@ Este projeto consiste em quatro códigos desenvolvidos para resolver questões e
 **Problemas**
 |Código | Título | Dificuldade |
 | -- | -- | -- |
+| [2577](https://leetcode.com/problems/minimum-time-to-visit-a-cell-in-a-grid/description/) | Minimum Time To Visit a Cell in a Grid | Difícil |
 
 
 ## Screenshots
+- Questão 2577
+
+![Print da aceitação do problema 2577](./Questão_2577/image.png)
 
 
 
