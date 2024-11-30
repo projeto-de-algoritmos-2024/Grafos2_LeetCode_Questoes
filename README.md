@@ -17,6 +17,7 @@ Este projeto consiste em quatro códigos desenvolvidos para resolver questões e
 |Código | Título | Dificuldade |
 | -- | -- | -- |
 | [2577](https://leetcode.com/problems/minimum-time-to-visit-a-cell-in-a-grid/description/) | Minimum Time To Visit a Cell in a Grid | Difícil |
+| [64](https://leetcode.com/problems/minimum-path-sum/description/) | Minimum Path Sum | Médio |
 
 
 ## Screenshots
