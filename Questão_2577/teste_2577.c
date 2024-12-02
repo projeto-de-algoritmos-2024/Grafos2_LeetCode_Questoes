@@ -56,7 +56,7 @@ void inserirHeap(Heap* heap, Celula celula) {
     shiftUp(heap, heap->tamanho - 1);
 }
 
-Celula extrairMin(Heap* heap) {
+Celula remove(Heap* heap) {
     Celula min = heap->dados[0];
     heap->dados[0] = heap->dados[heap->tamanho - 1];
     heap->tamanho--;
@@ -74,12 +74,12 @@ int minimumTime(int** grid, int gridSize, int* gridColSize) {
     //inicializa a vari�vel "linhas" com o tamanho das linhas e "colunas" com o tamanho das colunas para usar no loop
     int linhas = gridSize, colunas = gridColSize[0];
 
-    //cria uma matriz `time` para armazenar o tempo m�nimo para andar para cada c�lula.
+    //cria uma matriz "tempo" para armazenar o menor tempo ao andar para cada c�lula.
     int** tempo = (int**)malloc(linhas * sizeof(int*));
     for (int i = 0; i < linhas; i++) {
         tempo[i] = (int*)malloc(colunas * sizeof(int));
         for (int j = 0; j < colunas; j++) {
-            // Inicializa todas as posi��es com `INT_MAX` (tempo infinito).
+            // inicializa todas as posi��es com `INT_MAX` (tempo infinito).
             tempo[i][j] = INT_MAX;
         }
     }
@@ -97,7 +97,7 @@ int minimumTime(int** grid, int gridSize, int* gridColSize) {
     // a fun��o vai continuar iterando enquanto tiver elementos na heap.
     while (heap->tamanho > 0) {
         // retira a c�lula com o menor tempo.
-        Celula atual = extrairMin(heap);
+        Celula atual = remove(heap);
         int t = atual.tempo, i = atual.linha, j = atual.coluna;
 
         // se a c�lula retirada for o destino for a do canto inferior direito(n-1, m-1) retorna o tempo e libera a mem�ria.

@@ -37,3 +37,5 @@ Para verificar as resoluções das questões, copie a resolução da questão de
 
 
 ## Video
+
+### Questão Dificil 2577: [Minimum Time to Visit a Cell In a Grid](https://youtu.be/qS39MgiAOiI)
