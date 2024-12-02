@@ -2,112 +2,131 @@
 #include <stdlib.h>
 #include <limits.h>
 
-// Definição da estrutura MinHeap
+// Célula de um quadrante da matriz
 typedef struct {
-    int cost, x, y;
-} Node;
+    int custo, linha, coluna;
+} Celula;
 
 typedef struct {
-    Node *data;
-    int size;
-    int capacity;
-} MinHeap;
+    Celula* dados;
+    int tamanho;
+    int capacidade;
+} Heap;
 
-MinHeap* createHeap(int capacity) {
-    MinHeap* heap = (MinHeap*)malloc(sizeof(MinHeap));
-    heap->data = (Node*)malloc(sizeof(Node) * capacity);
-    heap->size = 0;
-    heap->capacity = capacity;
+// Funções auxiliares para a heap
+Heap* criarHeap(int capacidade) {
+    Heap* heap = (Heap*)malloc(sizeof(Heap));
+    heap->dados = (Celula*)malloc(capacidade * sizeof(Celula));
+    heap->tamanho = 0;
+    heap->capacidade = capacidade;
     return heap;
 }
 
-void swap(Node* a, Node* b) {
-    Node temp = *a;
+void swap(Celula* a, Celula* b) {
+    Celula temp = *a;
     *a = *b;
     *b = temp;
 }
 
-void heapifyUp(MinHeap* heap, int index) {
-    while (index > 0 && heap->data[index].cost < heap->data[(index - 1) / 2].cost) {
-        swap(&heap->data[index], &heap->data[(index - 1) / 2]);
-        index = (index - 1) / 2;
+void shiftUp(Heap* heap, int indice) {
+    while (indice > 0) {
+        int pai = (indice - 1) / 2;
+        if (heap->dados[indice].custo >= heap->dados[pai].custo) break;
+        swap(&heap->dados[indice], &heap->dados[pai]);
+        indice = pai;
     }
 }
 
-void heapifyDown(MinHeap* heap, int index) {
-    int smallest = index;
-    int left = 2 * index + 1;
-    int right = 2 * index + 2;
-
-    if (left < heap->size && heap->data[left].cost < heap->data[smallest].cost)
-        smallest = left;
-    if (right < heap->size && heap->data[right].cost < heap->data[smallest].cost)
-        smallest = right;
-
-    if (smallest != index) {
-        swap(&heap->data[index], &heap->data[smallest]);
-        heapifyDown(heap, smallest);
+void heapify(Heap* heap, int indice) {
+    while (2 * indice + 1 < heap->tamanho) {
+        int esquerda = 2 * indice + 1;
+        int direita = 2 * indice + 2;
+        int menor = esquerda;
+        if (direita < heap->tamanho && heap->dados[direita].custo < heap->dados[esquerda].custo) {
+            menor = direita;
+        }
+        if (heap->dados[indice].custo <= heap->dados[menor].custo) break;
+        swap(&heap->dados[indice], &heap->dados[menor]);
+        indice = menor;
     }
 }
 
-void insertHeap(MinHeap* heap, int cost, int x, int y) {
-    if (heap->size == heap->capacity) return;
-    heap->data[heap->size++] = (Node){cost, x, y};
-    heapifyUp(heap, heap->size - 1);
+void inserirHeap(Heap* heap, Celula celula) {
+    heap->dados[heap->tamanho] = celula;
+    heap->tamanho++;
+    shiftUp(heap, heap->tamanho - 1);
 }
 
-Node extractMin(MinHeap* heap) {
-    Node minNode = heap->data[0];
-    heap->data[0] = heap->data[--heap->size];
-    heapifyDown(heap, 0);
-    return minNode;
+Celula extrairMin(Heap* heap) {
+    Celula min = heap->dados[0];
+    heap->dados[0] = heap->dados[heap->tamanho - 1];
+    heap->tamanho--;
+    heapify(heap, 0);
+    return min;
 }
 
-int isEmpty(MinHeap* heap) {
-    return heap->size == 0;
+int verificaNo(int i, int j, int linhas, int colunas) {
+    return i < 0 || i >= linhas || j < 0 || j >= colunas;
 }
 
 int minPathSum(int** grid, int gridSize, int* gridColSize) {
-    int direcoes[4][2] = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
-    int linhas = gridSize, colunas = *gridColSize;
+    int linhas = gridSize, colunas = gridColSize[0]; //inicializa as linhas e colunas fornecidas
 
-    int** dist = (int**)malloc(linhas * sizeof(int*));
-    for (int i = 0; i < linhas; ++i) {
-        dist[i] = (int*)malloc(colunas * sizeof(int));
-        for (int j = 0; j < colunas; ++j) {
-            dist[i][j] = INT_MAX;
+    // cria a matriz para armazenar o menor custo, com o tamanho das linhas e das colunas fornecidas
+    int** custo = (int**)malloc(linhas * sizeof(int*));
+    for (int i = 0; i < linhas; i++) {
+        custo[i] = (int*)malloc(colunas * sizeof(int));
+        for (int j = 0; j < colunas; j++) {
+            custo[i][j] = INT_MAX;
         }
     }
-    dist[0][0] = grid[0][0];
 
-    MinHeap* heap = createHeap(linhas * colunas);
-    insertHeap(heap, grid[0][0], 0, 0);
+    // cria uma heap de ordem crescente para buscar o menor custo
+    Heap* heap = criarHeap(linhas * colunas);
 
-    while (!isEmpty(heap)) {
-        Node current = extractMin(heap);
-        int x = current.x, y = current.y, cost = current.cost;
+    // insere a célula inicial (0, 0) com o seu custo
+    inserirHeap(heap, (Celula){grid[0][0], 0, 0});
+    custo[0][0] = grid[0][0];
 
-        if (x == linhas - 1 && y == colunas - 1) {
-            for (int i = 0; i < linhas; ++i) free(dist[i]);
-            free(dist);
-            free(heap->data);
+    // define os deslocamentos poss�veis (direita, baixo, esquerda, cima)
+    static const int deslocamento[5] = {0, 1, 0, -1, 0};
+
+    // continua a iteração enquanto tiver caminhos na heap
+    while (heap->tamanho > 0) {
+        Celula atual = extrairMin(heap); // célula com menor custo
+        int c = atual.custo, i = atual.linha, j = atual.coluna;
+
+        // verifica se chegou na célula do canto inferior esquerdo
+        if (i == linhas - 1 && j == colunas - 1) {
+            for (int k = 0; k < linhas; k++) free(custo[k]);
+            free(custo);
+            free(heap->dados);
             free(heap);
-            return cost;
+            return c;
         }
 
-        for (int i = 0; i < 4; ++i) {
-            int nx = x + direcoes[i][0];
-            int ny = y + direcoes[i][1];
+        // explora as 4 opções de caminho adjacentes
+        for (int a = 0; a < 2; a++) {
+            int novaLinha = i + deslocamento[a], novaColuna = j + deslocamento[a + 1]; // cria a localizacao (linha e coluna) da proxima célula caminho
 
-            if (nx >= 0 && ny >= 0 && nx < linhas && ny < colunas) {
-                int newCost = cost + grid[nx][ny];
-                if (newCost < dist[nx][ny]) {
-                    dist[nx][ny] = newCost;
-                    insertHeap(heap, newCost, nx, ny);
-                }
+            // verifica se a localizacao está dentro da matriz
+            if (verificaNo(novaLinha, novaColuna, linhas, colunas)) continue;
+
+            // calcula o custo para alcançar a célula adjacente
+            int novoCusto = c + grid[novaLinha][novaColuna];
+
+            // atualiza o custo se for menor
+            if (novoCusto < custo[novaLinha][novaColuna]) {
+                custo[novaLinha][novaColuna] = novoCusto;
+                inserirHeap(heap, (Celula){novoCusto, novaLinha, novaColuna});
             }
         }
     }
 
+    // Caso não seja possível alcançar o destino
+    for (int i = 0; i < linhas; i++) free(custo[i]);
+    free(custo);
+    free(heap->dados);
+    free(heap);
     return -1;
 }
