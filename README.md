@@ -18,6 +18,7 @@ Este projeto consiste em quatro códigos desenvolvidos para resolver questões e
 | -- | -- | -- |
 | [2577](https://leetcode.com/problems/minimum-time-to-visit-a-cell-in-a-grid/description/) | Minimum Time To Visit a Cell in a Grid | Difícil |
 | [64](https://leetcode.com/problems/minimum-path-sum/description/) | Minimum Path Sum | Médio |
+| [2642](https://leetcode.com/problems/design-graph-with-shortest-path-calculator/description/) | Design Graph With Shortest Path Calculator | Difícil |
 
 
 ## Screenshots
@@ -29,6 +30,10 @@ Este projeto consiste em quatro códigos desenvolvidos para resolver questões e
 
 ![Print da aceitação do problema 64](./Questão_64/image64.png)
 
+- Questão 2642
+
+![Print da aceitação do problema 2642](./Questão_2642/2642.png)
+
 
 
 ## Uso 
@@ -39,3 +44,7 @@ Para verificar as resoluções das questões, copie a resolução da questão de
 ## Video
 
 ### Questão Dificil 2577: [Minimum Time to Visit a Cell In a Grid](https://youtu.be/qS39MgiAOiI)
+
+### Questão Media 64: [Minimum Path Sum](https://youtu.be/0h563qIKBf4)
+
+### Questão Media 2642: [Design Graph With Shortest Path Calculator](https://youtu.be/aIC9i8v3wok)
